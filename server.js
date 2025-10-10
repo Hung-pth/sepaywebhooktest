@@ -35,7 +35,7 @@ app.post("/api/sepay/webhook", async (req, res) => {
       console.log(`🧾 Mã tham chiếu: ${referenceCode}`);
 
       // 🔗 Gửi dữ liệu sang backend XemPhim để xác nhận thanh toán
-      const backendUrl = process.env.BACKEND_URL || "http://localhost:8080";
+      const backendUrl = process.env.BACKEND_URL || "https://unsentiently-fattenable-daria.ngrok-free.dev";
       const confirmUrl = `${backendUrl}/api/payments/confirm`;
 
       console.log(`🚀 Gửi xác nhận thanh toán tới backend: ${confirmUrl}`);
@@ -87,5 +87,6 @@ const PORT = process.env.PORT || 9090;
 app.listen(PORT, () => {
   console.log(`🚀 [SePay Webhook] Server đang chạy ở port ${PORT}`);
 });
+
 
 
