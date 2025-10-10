@@ -5,6 +5,9 @@ import axios from "axios";
 dotenv.config();
 const app = express();
 app.use(express.json());
+console.log("PORT:", process.env.PORT);
+console.log("BACKEND_URL:", process.env.BACKEND_URL);
+
 
 // ✅ Webhook từ SePay
 app.post("/api/sepay/webhook", async (req, res) => {
@@ -85,3 +88,4 @@ const PORT = process.env.PORT || 9090;
 app.listen(PORT, () => {
   console.log(`🚀 [SePay Webhook] Server đang chạy ở port ${PORT}`);
 });
+
