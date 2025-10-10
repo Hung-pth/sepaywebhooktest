@@ -8,10 +8,11 @@ app.use(express.json());
 
 // ✅ Webhook từ SePay
 app.post("/api/sepay/webhook", async (req, res) => {
+  console.log("📬 [SePay] Webhook nhận được yêu cầu mới!");
+  console.log("🧾 Payload nhận:", req.body);
+
   try {
     const data = req.body;
-    console.log("📩 Webhook nhận được:", data);
-
     const {
       transferAmount,
       content,
@@ -26,28 +27,50 @@ app.post("/api/sepay/webhook", async (req, res) => {
 
     if (bookingCode) {
       console.log(`🔍 Phát hiện mã booking: ${bookingCode}`);
-      console.log(`💰 Số tiền: ${transferAmount}`);
+      console.log(`💰 Số tiền giao dịch: ${transferAmount}`);
+      console.log(`🏦 Ngân hàng / tài khoản: ${accountNumber}`);
+      console.log(`📅 Ngày giao dịch: ${transactionDate}`);
+      console.log(`🧾 Mã tham chiếu: ${referenceCode}`);
 
       // 🔗 Gửi dữ liệu sang backend XemPhim để xác nhận thanh toán
-      await axios.post(
-        "http://localhost:8080/api/payments/confirm", // ⬅️ đổi thành API thật của bạn
-        {
+      const backendUrl = process.env.BACKEND_URL || "http://localhost:8080";
+      const confirmUrl = `${backendUrl}/api/payments/confirm`;
+
+      console.log(`🚀 Gửi xác nhận thanh toán tới backend: ${confirmUrl}`);
+
+      try {
+        const response = await axios.post(confirmUrl, {
           bookingCode,
           amount: transferAmount,
           referenceCode,
           accountNumber,
           transactionDate,
-        }
-      );
+        });
 
-      console.log(`✅ Đã gửi xác nhận thanh toán cho ${bookingCode}`);
+        console.log(
+          `✅ Backend phản hồi [${response.status}]:`,
+          response.data || "(no data)"
+        );
+        console.log(`🎉 Đã gửi xác nhận thành công cho ${bookingCode}`);
+      } catch (err) {
+        console.error(
+          `❌ Lỗi khi gửi tới backend (${confirmUrl}): ${err.message}`
+        );
+        if (err.response) {
+          console.error(
+            "🧩 Phản hồi lỗi từ backend:",
+            err.response.status,
+            err.response.data
+          );
+        }
+      }
     } else {
-      console.log("⚠️ Không tìm thấy mã booking trong nội dung giao dịch!");
+      console.warn("⚠️ Không tìm thấy mã booking trong nội dung giao dịch!");
     }
 
     res.status(200).json({ message: "OK" });
   } catch (error) {
-    console.error("❌ Lỗi khi xử lý webhook:", error.message);
+    console.error("💥 Lỗi khi xử lý webhook tổng thể:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -60,5 +83,5 @@ app.get("/", (req, res) => {
 // ✅ Start server
 const PORT = process.env.PORT || 9090;
 app.listen(PORT, () => {
-  console.log(`🚀 Server đang chạy ở port ${PORT}`);
+  console.log(`🚀 [SePay Webhook] Server đang chạy ở port ${PORT}`);
 });
