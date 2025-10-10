@@ -1,0 +1,17 @@
+{
+  "name": "sepaywebhooktest",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["sepay", "webhook", "nodejs", "express"],
+  "author": "Pham Tuan Hung",
+  "license": "MIT",
+  "description": "Simple webhook test server for SePay integration",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2"
+  }
+}
